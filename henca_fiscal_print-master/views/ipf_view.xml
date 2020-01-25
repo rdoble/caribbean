@@ -1,0 +1,73 @@
+<odoo>
+    <data>
+
+        <record id="hencal_fiscal_print" model="ir.actions.act_window">
+            <field name="name">Impresoras Fiscales </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ipf.printer.config</field>
+            <!-- <field name="view_mode">form, tree</field> -->
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Impresoras Fiscales
+                </p>
+                <p>
+                    Aqui se listaran todos las impresoras fiscales instaladas.
+                </p>
+            </field>
+        </record>
+
+        <record id="henca_printer_config_tree" model="ir.ui.view">
+            <field name="name">Impresoras Fiscales</field>
+            <field name="model">ipf.printer.config</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Impresoras Fiscales">
+                    <field name="name"/>
+                    <field name="serial"/>
+                    <field name="subsidiary"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="ipf_printer_config_form_view" model="ir.ui.view">
+            <field name="name">Impresora Fiscal</field>
+            <field name="model">ipf.printer.config</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Impresora Fiscal">
+                    <header>
+                        <button name="z_close_print" custom="z_close_print" string="Imprimir Cierre Z" type="object" class="btn-primary"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-check">
+                                <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;active&quot;}"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="host"/>
+                                <field name="user_ids" widget="many2many_tags" />
+                            </group>
+                            <group>
+                                <field name="subsidiary"/>
+                                <field name="serial"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- This Menu Item Must have a parent -->
+		<menuitem id="henca_account_fiscal_menu" name="Impresoras Fiscales" parent="account.menu_finance_entries" sequence="5"
+              groups="account.group_account_user"
+              action="hencal_fiscal_print"/>
+
+    </data>
+</odoo>
