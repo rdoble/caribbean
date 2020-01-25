@@ -11,6 +11,7 @@
     'website': "",
     'data': [
         'views/users_stock_view.xml',
+        'views/sale_order_stock_readonly_view.xml',
     ],
     'category': 'Hidden',
     'version': '12.0',
