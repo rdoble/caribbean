@@ -13,11 +13,10 @@ class SaleOrder(models.Model):
     
     warehouse_id = fields.Many2one( 'stock.warehouse', string='Warehouse', required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)], 'sale': [('readonly', True)], 'done': [('readonly', True)], 'cancel': [('readonly', True)]})
     
-    @api.onchange('partner_id')
+    @api.onchange('user_id')
     def _default_warehouse_id(self):
-        res_user = self.env['res.users'].search([('id', '=', self._uid)])
         
-        if res_user.stock_id:
-           self.warehouse_id = res_user.stock_id.id
+        if self.user_id and self.user_id.stock_id :
+           self.warehouse_id = self.user_id.stock_id.id
         else:
             raise Warning ("Usuario no tiene almacen asignado, por favor cominicarse con el administrador del sistema")
