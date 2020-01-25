@@ -1,3 +1,3 @@
 # # -*- coding: utf-8 -*-
 
-from . import partner_acint
+from . import res_users
