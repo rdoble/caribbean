@@ -15,8 +15,10 @@ class SaleOrder(models.Model):
     
     @api.onchange('user_id')
     def _default_warehouse_id(self):
+        res_user = self.env['res.users'].search([('id', '=', self._uid)])
         
-        if self.user_id and self.user_id.stock_id :
-           self.warehouse_id = self.user_id.stock_id.id
+        if res_user.stock_id:
+           self.warehouse_id = res_user.stock_id.id
         else:
             raise Warning ("Usuario no tiene almacen asignado, por favor cominicarse con el administrador del sistema")
+
