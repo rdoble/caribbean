@@ -19,7 +19,7 @@ _logger = logging.getLogger(__name__)
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    sales_is_blocked = fields.Boolean(string='Bloquear ventas', help="Bloquear ventas cuando el cliente tiene facturas vencidas pendientes de pago ")
+    sales_is_blocked = fields.Boolean(string='Bloquear ventas', default=True, help="Bloquear ventas cuando el cliente tiene facturas vencidas pendientes de pago ")
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
