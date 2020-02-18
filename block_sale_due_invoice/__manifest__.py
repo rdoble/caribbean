@@ -12,6 +12,7 @@
 # You should have received a copy of the GNU General Public License
 # See <https://www.gnu.org/licenses/>.
 
+
 {
     'name': "Block Sales Due Invoice",
     'version': '12.0.1.1.0',
