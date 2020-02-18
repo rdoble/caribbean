@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Form View to Modify it -->
+    <record id="block_sale_res_partner_form" model="ir.ui.view">
+        <field name="name">block.sale.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                <field name="sales_is_blocked" />
+                <field name="limit_amount" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
