@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='property_payment_term_id']" position="after">
                 <field name="sales_is_blocked" />
-                <field name="limit_amount" />
+                <!-- <field name="limit_amount" /> -->
             </xpath>
         </field>
     </record>
