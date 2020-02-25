@@ -44,7 +44,7 @@ class SaleOrder(models.Model):
 
                 for inv in invoices:
 
-                    total_amount += total_amount
+                    total_amount += inv.residual
 
                     d1 = date(int(current_date.split(
                         "-")[0]), int(current_date.split("-")[1]), int(current_date.split("-")[2]))
@@ -54,7 +54,7 @@ class SaleOrder(models.Model):
 
                     for payterm in inv.payment_term_id.line_ids:
                         payterm_day = payterm.days
-
+                    
                     if (total_amount + rec.amount_total) > rec.partner_id.limit_amount and (d1-d2).days > payterm_day:
                         raise Warning(_("El cliente {} tiene pagos vencidos pendientes".format(inv.partner_id.name)))
 
