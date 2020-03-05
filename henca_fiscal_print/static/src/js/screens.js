@@ -35,7 +35,9 @@ odoo.define('henca_fiscal_print.screens', function (require) {
               price_unit = price_unit * (tax_amount / 100.0 + 1)
             }
             return {
-              description: name,
+              description: name
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/['"]+/g, ''),
               quantity: quantity,
               price: price_unit,
               itbis: tax_amount,
@@ -48,7 +50,11 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           })) : [{ type: "credit", description: "Credito", amount: amount_total }],
           comments: [
             `No. Documento: ${number}`,
-            ...comment.match(/.{1,40}/g).slice(0,9)
+            ...comment
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/['"]+/g, '')
+              .match(/.{1,40}/g).slice(0,9)
           ]
         }
         
