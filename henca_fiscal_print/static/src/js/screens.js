@@ -37,7 +37,8 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             return {
               description: name
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/['"]+/g, ''),
+                .replace(/['"]+/g, '')
+                .slice(0, 40),
               quantity: quantity,
               price: price_unit,
               itbis: tax_amount,
@@ -54,7 +55,8 @@ odoo.define('henca_fiscal_print.screens', function (require) {
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")
               .replace(/['"]+/g, '')
-              .match(/.{1,40}/g).slice(0,9)
+              .match(/.{1,40}/g)
+              .slice(0, 9)
           ]
         }
         
