@@ -6,7 +6,8 @@ odoo.define('henca_fiscal_print.screens', function (require) {
   FormController.include({
     _onButtonClicked: function (event) {
       if (event.data.attrs.custom === "fiscal_print") {
-        var {
+        const {
+          number,
           sale_fiscal_type,
           user_id,
           reference,
@@ -15,10 +16,12 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           invoice_line_ids,
           ipf_host,
           payment_ids,
-          amount_total
+          amount_total,
+          comment,
+          ipf_print_copy_number
         } = event.data.record.data;
 
-        var ipf_invoice = {
+        const ipf_invoice = {
           type: sale_fiscal_type,
           cashier: user_id.data.id,
           subsidiary: 1,
@@ -40,31 +43,46 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             type: payment_form === "bank" ? "check" : payment_form,
             amount: amount,
             description: journal_id.data.display_name
-          })) : [{ type: "credit", description: "Credito", amount: amount_total }]
+          })) : [{ type: "credit", description: "Credito", amount: amount_total }],
+          comments: [
+            `No. Documento: ${number}`,
+            ...comment.match(/.{1,40}/g).slice(0,9)
+          ]
         }
+        
         if (ipf_host) {
           $.ajax({
-              type: 'POST',
-              url: ipf_host + "/invoice",
-              data: JSON.stringify(ipf_invoice),
-              contentType: "application/json",
-              dataType: "json"
+            type: 'POST',
+            url: ipf_host + "/invoice",
+            data: JSON.stringify(ipf_invoice),
+            contentType: "application/json",
+            dataType: "json"
           }).done(function (response) {
-              console.log(response);
+            console.log(response);
           }).fail(function (response) {
-              console.log(response);
+            console.log(response);
           });
-        }
 
+          for(let i=0; i < ipf_print_copy_number; i++){
+            $.ajax({
+              type: 'GET',
+              url: ipf_host + "/copy",
+            }).done(function (response) {
+              console.log(response);
+            }).fail(function (response) {
+              console.log(response);
+            });
+          }
+        }
       } else if (event.data.attrs.custom === "z_close_print") {
-        var { host } = event.data.record.data;
+        const { host } = event.data.record.data;
         $.ajax({
           type: 'GET',
           url: host + "/zclose/print",
         }).done(function (response) {
-            console.log(response);
+          console.log(response);
         }).fail(function (response) {
-            console.log(response);
+          console.log(response);
         });
       }
       this._super(event);

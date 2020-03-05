@@ -30,6 +30,7 @@
                         </tree>
                     </field>
                     <field name="ipf_host" invisible="1" />
+                    <field name="ipf_print_copy_number" invisible="1" />
                 </field>
             </field>
         </record>

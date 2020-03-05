@@ -53,6 +53,7 @@
                             <group>
                                 <field name="host"/>
                                 <field name="user_ids" widget="many2many_tags" />
+                                <field name="print_copy_number"/>
                             </group>
                             <group>
                                 <field name="subsidiary"/>

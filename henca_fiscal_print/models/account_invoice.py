@@ -26,6 +26,11 @@ class AccountInvoice(models.Model):
         related='ipf_printer_id.host'
     )
 
+    ipf_print_copy_number = fields.Integer(
+        string="Numero de Copias",
+        related='ipf_printer_id.print_copy_number'
+    )
+
     def _get_fiscal_printer(self):
         ipf_printer_id = self.env['ipf.printer.config'].search([
             ('user_ids', '=', self.user_id.id)
