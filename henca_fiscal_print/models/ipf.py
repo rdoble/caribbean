@@ -8,7 +8,7 @@ class ipf_printer_config(models.Model):
     _name = 'ipf.printer.config'
 
     IPF_TYPE = [
-        ('epson', 'EPSON TM-T88v')
+        ('epson', 'EPSON TM-T88v'),
         ('bixolon', 'BIXOLON SRP-350')
     ]
 
