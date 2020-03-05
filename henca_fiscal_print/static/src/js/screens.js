@@ -40,13 +40,13 @@ odoo.define('henca_fiscal_print.screens', function (require) {
                 .replace(/['"]+/g, '')
                 .slice(0, 40),
               quantity: quantity,
-              price: price_unit,
+              price: price_unit.toFixed(2),
               itbis: tax_amount,
             }
           }),
           payments: payment_ids.data.length > 0 ? payment_ids.data.map(({ data: { amount, payment_form, journal_id }  }) => ({
             type: payment_form === "bank" ? "check" : payment_form,
-            amount: amount,
+            amount: amount.toFixed(2),
             description: journal_id.data.display_name
           })) : [{ type: "credit", description: "Credito", amount: amount_total }],
           comments: [
