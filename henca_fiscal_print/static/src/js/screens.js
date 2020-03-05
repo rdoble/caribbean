@@ -29,7 +29,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           copy: ipf_print_copy_number > 0 ? true : false,
           ncf: "00000000" + reference,
           client: partner_id.data.display_name.split("\n")[0],
-          rnc: partner_vat || '',
+          rnc: partner_vat === "NULL" ? '' : partner_vat || '',
           items: invoice_line_ids.data.map(({ data: { name, quantity, price_unit, tax_amount, tax_amount_type } }) => {
             if (tax_amount_type === 'percent') {
               price_unit = price_unit * (tax_amount / 100.0 + 1)
