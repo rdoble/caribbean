@@ -7,9 +7,21 @@ from odoo import models, fields
 class ipf_printer_config(models.Model):
     _name = 'ipf.printer.config'
 
+    IPF_TYPE = [
+        ('epson', 'EPSON TM-T88v')
+        ('bixolon', 'BIXOLON SRP-350')
+    ]
+
     name = fields.Char(
         string="Descripcion",
         required=True
+    )
+
+    ipf_type = fields.Selection(
+        string="IPF Impresora",
+        required=True,
+        selection=IPF_TYPE,
+        default='epson'
     )
 
     host = fields.Char(

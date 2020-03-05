@@ -18,6 +18,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           payment_ids,
           amount_total,
           comment,
+          ipf_type,
           ipf_print_copy_number
         } = event.data.record.data;
 
@@ -25,6 +26,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           type: sale_fiscal_type,
           cashier: user_id.data.id,
           subsidiary: 1,
+          copy: ipf_print_copy_number > 0 ? true : false,
           ncf: "00000000" + reference,
           client: partner_id.data.display_name.split("\n")[0],
           rnc: partner_vat,
@@ -62,16 +64,17 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           }).fail(function (response) {
             console.log(response);
           });
-
-          for(let i=0; i < ipf_print_copy_number; i++){
-            $.ajax({
-              type: 'GET',
-              url: ipf_host + "/copy",
-            }).done(function (response) {
-              console.log(response);
-            }).fail(function (response) {
-              console.log(response);
-            });
+          if (ipf_type === 'bixolon') {
+            for(let i=0; i < ipf_print_copy_number; i++){
+              $.ajax({
+                type: 'GET',
+                url: ipf_host + "/last",
+              }).done(function (response) {
+                console.log(response);
+              }).fail(function (response) {
+                console.log(response);
+              });
+            }
           }
         }
       } else if (event.data.attrs.custom === "z_close_print") {

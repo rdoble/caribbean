@@ -26,6 +26,12 @@ class AccountInvoice(models.Model):
         related='ipf_printer_id.host'
     )
 
+    ipf_type = fields.Selection(
+        string="IPF Impresora",
+        readonly=True,
+        related='ipf_printer_id.ipf_type'
+    )
+
     ipf_print_copy_number = fields.Integer(
         string="Numero de Copias",
         related='ipf_printer_id.print_copy_number'

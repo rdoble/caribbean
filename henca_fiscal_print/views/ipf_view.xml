@@ -58,6 +58,7 @@
                             <group>
                                 <field name="subsidiary"/>
                                 <field name="serial"/>
+                                <field name="ipf_type"/>
                             </group>
                         </group>
                     </sheet>
