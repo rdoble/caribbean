@@ -28,35 +28,35 @@ class ResPartner(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    @api.multi
-    def action_confirm(self, values):
+    # @api.multi
+    # def action_confirm(self, values):
 
-        self.ensure_one()
-        res = super(SaleOrder, self).action_confirm()
+    #     self.ensure_one()
+    #     res = super(SaleOrder, self).action_confirm()
 
-        for rec in self:
+    #     for rec in self:
 
-            if rec.partner_id.sales_is_blocked:
+    #         if rec.partner_id.sales_is_blocked:
 
-                invoices = self.env['account.invoice'].search([('partner_id', '=', rec.partner_id.id), ('state', 'in', [
-                    'open', 'in_payment']), ('type', '=', 'out_invoice')])
-                current_date = str(datetime.today())[0:10]
-                total_amount = 0.0
+    #             invoices = self.env['account.invoice'].search([('partner_id', '=', rec.partner_id.id), ('state', 'in', [
+    #                 'open', 'in_payment']), ('type', '=', 'out_invoice')])
+    #             current_date = str(datetime.today())[0:10]
+    #             total_amount = 0.0
 
-                for inv in invoices:
+    #             for inv in invoices:
 
-                    total_amount += inv.residual
+    #                 total_amount += inv.residual
 
-                    d1 = date(int(current_date.split(
-                        "-")[0]), int(current_date.split("-")[1]), int(current_date.split("-")[2]))
-                    d2 = date(int(str(inv.date_due).split(
-                        "-")[0]), int(str(inv.date_due).split("-")[1]), int(str(inv.date_due).split("-")[2]))
-                    payterm_day = 0
+    #                 d1 = date(int(current_date.split(
+    #                     "-")[0]), int(current_date.split("-")[1]), int(current_date.split("-")[2]))
+    #                 d2 = date(int(str(inv.date_due).split(
+    #                     "-")[0]), int(str(inv.date_due).split("-")[1]), int(str(inv.date_due).split("-")[2]))
+    #                 payterm_day = 0
 
-                    for payterm in inv.payment_term_id.line_ids:
-                        payterm_day = payterm.days
+    #                 for payterm in inv.payment_term_id.line_ids:
+    #                     payterm_day = payterm.days
                             
-                    if (total_amount + rec.amount_total) > rec.partner_id.limit_amount and (d1-d2).days > payterm_day:
-                        raise Warning(_("El cliente {} tiene pagos vencidos pendientes".format(inv.partner_id.name)))
+    #                 if (total_amount + rec.amount_total) > rec.partner_id.limit_amount and (d1-d2).days > payterm_day:
+    #                     raise Warning(_("El cliente {} tiene pagos vencidos pendientes".format(inv.partner_id.name)))
 
-        return res
+    #     return res
