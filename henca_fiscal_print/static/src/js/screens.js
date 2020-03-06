@@ -22,14 +22,42 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           ipf_print_copy_number
         } = event.data.record.data;
 
+        const comments_array = [];
+        if (comment) {
+          const normalized_comment = comment
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/['"]+/g, '');
+
+          const comment_words_array = normalized_comment.split(' ');
+          let comments_array_index = 0;
+          let new_string_line = '';
+
+          for(let i=0; i < comment_words_array.length; i++){
+            if (comments_array[comments_array_index]) {
+              new_string_line = comments_array[comments_array_index] + ' ' + comment_words_array[i];
+              if (new_string_line.length > 40) {
+                comments_array_index++;
+                if (comments_array_index == 9) break;
+                comments_array[comments_array_index] = comment_words_array[i]
+              } else {
+                comments_array[comments_array_index] = new_string_line;
+              }
+            } else {
+              comments_array[comments_array_index] = comment_words_array[i];
+            }
+          }
+        }
+
         const ipf_invoice = {
           type: sale_fiscal_type,
           cashier: user_id.data.id,
           subsidiary: 1,
-          copy: ipf_print_copy_number > 0 ? true : false,
+          copy: ipf_print_copy_number == 1,
+          copy2: ipf_print_copy_number == 2,
           ncf: "00000000" + reference,
           client: partner_id.data.display_name.split("\n")[0],
-          rnc: partner_vat === "NULL" ? '' : partner_vat || '',
+          rnc: partner_vat || '',
           items: invoice_line_ids.data.map(({ data: { name, quantity, price_unit, tax_amount, tax_amount_type } }) => {
             if (tax_amount_type === 'percent') {
               price_unit = price_unit * (tax_amount / 100.0 + 1)
@@ -50,16 +78,11 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             description: journal_id.data.display_name
           })) : [{ type: "credit", description: "Credito", amount: amount_total }],
           comments: [
-            `No. Documento: ${number}`,
-            ...comment
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .replace(/['"]+/g, '')
-              .match(/.{1,40}/g)
-              .slice(0, 9)
+            'No. Documento:' + ' ' + number,
+            ...comments_array
           ]
         }
-        
+        console.log(ipf_invoice)
         if (ipf_host) {
           $.ajax({
             type: 'POST',
