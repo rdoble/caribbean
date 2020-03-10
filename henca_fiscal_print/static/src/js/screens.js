@@ -56,10 +56,18 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           ncf: "00000000" + reference,
           client: partner_id.data.display_name.split("\n")[0],
           rnc: partner_vat || '',
-          items: invoice_line_ids.data.map(({ data: { name, quantity, price_unit, tax_amount, tax_amount_type } }) => {
+          items: invoice_line_ids.data.map(({ data: {
+            name,
+            quantity,
+            price_unit,
+            tax_amount,
+            tax_amount_type,
+            discount
+          } }) => {
             if (tax_amount_type === 'percent') {
-              price_unit = price_unit * (tax_amount / 100.0 + 1)
+              price_unit *= (tax_amount / 100.0 + 1)
             }
+
             return {
               description: name
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -68,6 +76,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
               quantity: quantity,
               price: price_unit.toFixed(2),
               itbis: tax_amount,
+              discount: discount || 0
             }
           }),
           payments: payment_ids.data.length > 0 ? payment_ids.data.map(({ data: { amount, payment_form, journal_id }  }) => ({
@@ -99,6 +108,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             console.log(response);
             if (ipf_type === 'bixolon') {
               for(let i=0; i < ipf_print_copy_number; i++){
+                console.log(`Copy number ${i}`);
                 $.ajax({
                   type: 'GET',
                   url: ipf_host + "invoice/last",
