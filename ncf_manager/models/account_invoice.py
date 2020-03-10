@@ -39,6 +39,34 @@ class AccountInvoice(models.Model):
 
     reference = fields.Char(string='NCF')
 
+    sequence_almost_depleted = fields.Boolean(
+        compute="_compute_sequence_almost_depleted")
+
+    @api.depends('journal_id', 'sale_fiscal_type')
+    def _compute_sequence_almost_depleted(self):
+        for invoice in self:
+            if invoice.journal_id.ncf_control and invoice.type == "out_invoice":
+                sequence = invoice.journal_id.date_range_ids.filtered(
+                    lambda seq: seq.sale_fiscal_type == invoice.
+                    sale_fiscal_type)
+                if sequence:
+                    if sequence.number_next_actual >= sequence.warning_ncf:
+                        invoice.sequence_almost_depleted = True
+                    else:
+                        invoice.sequence_almost_depleted = False
+
+            if invoice.journal_id.purchase_type in (
+                    'informal', 'minor',
+                    'exterior') and invoice.type == "in_invoice":
+                sequence = invoice.journal_id.date_range_ids.filtered(
+                    lambda seq: seq.sale_fiscal_type == invoice.journal_id.
+                    purchase_type)
+                if sequence:
+                    if sequence.number_next_actual >= sequence.warning_ncf:
+                        invoice.sequence_almost_depleted = True
+                    else:
+                        invoice.sequence_almost_depleted = False
+
     @api.multi
     @api.depends('currency_id', "date_invoice")
     def _get_rate(self):
@@ -71,8 +99,7 @@ class AccountInvoice(models.Model):
                         inv.ncf_expiration_date = [
                             dr.date_to
                             for dr in inv.journal_id.date_range_ids
-                            if dr.sale_fiscal_type == inv.sale_fiscal_type
-                        ][0]
+                            if dr.sale_fiscal_type == inv.sale_fiscal_type][0]
                     except IndexError:
                         raise ValidationError(
                             _('Error. No sequence range for NCF para: {}')
@@ -188,7 +215,7 @@ class AccountInvoice(models.Model):
                     u"para registrar compras Fiscales")
                     .format(self.partner_id.name))
 
-            elif (self.journal_id.ncf_remote_validation and
+            elif (self.journal_id.ncf_remote_validation and len(NCF) == '9' and 
                   not ncf_validation.check_dgii(self.partner_id.vat, NCF)):
                 raise ValidationError(_(
                     u"NCF NO pasó validación en DGII\n\n"
@@ -243,12 +270,12 @@ class AccountInvoice(models.Model):
     def _onchange_partner_id(self):
         res = super(AccountInvoice, self)._onchange_partner_id()
         if self.partner_id and self.type == 'out_invoice':
-            if self.journal_id.ncf_control:
+            if self.journal_id.ncf_control and not self.sale_fiscal_type:
                 self.sale_fiscal_type = self.partner_id.sale_fiscal_type
                 self.special_check()
             if not self.partner_id.customer:
                 self.partner_id.customer = True
-        elif self.partner_id and self.type == 'in_invoice':
+        elif self.partner_id and self.type == 'in_invoice' and not self.expense_type:
             self.expense_type = self.partner_id.expense_type
             if not self.partner_id.supplier:
                 self.partner_id.supplier = True
@@ -352,6 +379,15 @@ class AccountInvoice(models.Model):
                         "requerido para este tipo de factura.").format(
                             inv.partner_id.id, inv.partner_id.name))
 
+                sequence = inv.journal_id.date_range_ids.filtered(
+                    lambda seq: seq.sale_fiscal_type == inv.sale_fiscal_type)
+                if sequence.number_next_actual > sequence.max_number_next:
+                    raise ValidationError(_(
+                        u"Los comprobantes para {} se han agotado,"
+                        " contacte al responsable de contabilidad ({}).").format(
+                        dict(self._fields['sale_fiscal_type'].selection)
+                            .get(self.sale_fiscal_type), sequence.max_number_next))
+
                 if inv.sale_fiscal_type in (
                         "fiscal", "gov", "special") and not inv.partner_id.vat:
                     raise UserError(_(
@@ -367,6 +403,21 @@ class AccountInvoice(models.Model):
                         u"tener un RNC o Céd para emitir la factura"))
 
             elif inv.type in ("in_invoice", "in_refund"):
+
+                if not inv.reference and inv.journal_id.purchase_type in ('informal',
+                                                                          'minor',
+                                                                          'exterior'):
+                    sequence1 = inv.journal_id.date_range_ids.filtered(
+                        lambda seq: seq.sale_fiscal_type == inv.journal_id.purchase_type
+                    )
+
+                    if sequence1.number_next_actual > sequence1.max_number_next:
+                        raise ValidationError(_(
+                            u"Los comprobantes para {} se han agotado,"
+                            " contacte al responsable de contabilidad ({}).").format(
+                                dict(self._fields['sale_fiscal_type'].selection)
+                                .get(self.sale_fiscal_type), sequence1.max_number_next))
+
                 if inv.reference and inv.journal_id.purchase_type in (
                         'normal', 'informal', 'minor', 'exterior'):
                     if not inv.partner_id.vat:
