@@ -101,7 +101,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
               for(let i=0; i < ipf_print_copy_number; i++){
                 $.ajax({
                   type: 'GET',
-                  url: ipf_host + "/last",
+                  url: ipf_host + "invoice/last",
                 }).done(function (response) {
                   console.log(response);
                 }).fail(function (response) {
