@@ -55,8 +55,8 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           subsidiary: 1,
           ncf: "00000000" + reference,
           client: partner_id.data.display_name.split("\n")[0],
-          rnc: partner_vat || '',
-          items: invoice_line_ids.data.map(({ data: {
+          rnc: partner_vat === "NULL" ? '' : partner_vat || '',
+	  items: invoice_line_ids.data.map(({ data: {
             name,
             quantity,
             price_unit,
