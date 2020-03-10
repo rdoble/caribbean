@@ -4,7 +4,25 @@ odoo.define('henca_fiscal_print.screens', function (require) {
   var FormController = require('web.FormController');
 
   FormController.include({
-    _onButtonClicked: function (event) {
+    ipf_request: async (type, uri, ipf_invoice=undefined) => {
+      const request = {
+        type,
+        url: uri,
+        contentType: "application/json",
+        dataType: "json"
+      };
+
+      if (ipf_invoice) {
+        request.data = JSON.stringify(ipf_invoice);
+      }
+
+      const response = await $.ajax(request)
+        .catch(error => console.log(error));
+
+      return response;
+    },
+
+    _onButtonClicked: async event => {
       if (event.data.attrs.custom === "fiscal_print") {
         const {
           number,
@@ -53,8 +71,6 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           type: sale_fiscal_type,
           cashier: user_id.data.id,
           subsidiary: 1,
-          copy: ipf_print_copy_number == 1,
-          copy2: ipf_print_copy_number == 2,
           ncf: "00000000" + reference,
           client: partner_id.data.display_name.split("\n")[0],
           rnc: partner_vat || '',
@@ -82,29 +98,23 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             ...comments_array
           ]
         }
-        console.log(ipf_invoice)
+
+        if (ipf_print_copy_number == 1 && ipf_type === 'epson') {
+          ipf_invoice.copy = true
+        } else if (ipf_print_copy_number == 2 && ipf_type === 'epson') {
+          ipf_invoice.copy2 = true
+        }
+
+        console.log(ipf_invoice);
         if (ipf_host) {
-          $.ajax({
-            type: 'POST',
-            url: ipf_host + "/invoice",
-            data: JSON.stringify(ipf_invoice),
-            contentType: "application/json",
-            dataType: "json"
-          }).done(function (response) {
-            console.log(response);
-          }).fail(function (response) {
-            console.log(response);
-          });
+          const response = await this.ipf_request('POST', `${ipf_host}/invoice`, ipf_invoice);
+          console.log('IPF Response:', response)
+    
           if (ipf_type === 'bixolon') {
+            let copy_response;
             for(let i=0; i < ipf_print_copy_number; i++){
-              $.ajax({
-                type: 'GET',
-                url: ipf_host + "/last",
-              }).done(function (response) {
-                console.log(response);
-              }).fail(function (response) {
-                console.log(response);
-              });
+              copy_response = await this.ipf_request('POST', `${ipf_host}/invoice/last`);
+              console.log(`IPF copy response number ${i}:`, copy_response)
             }
           }
         }
