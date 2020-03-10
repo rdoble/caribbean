@@ -67,8 +67,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             if (tax_amount_type === 'percent') {
               price_unit *= (tax_amount / 100.0 + 1)
             }
-
-            return {
+            const ipf_line = {
               description: name
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                 .replace(/['"]+/g, '')
@@ -76,8 +75,13 @@ odoo.define('henca_fiscal_print.screens', function (require) {
               quantity: quantity,
               price: price_unit.toFixed(2),
               itbis: tax_amount,
-              discount: discount || 0
+            };
+
+            if (discount) {
+              ipf_line.discount = discount;
             }
+
+            return ipf_line;
           }),
           payments: payment_ids.data.length > 0 ? payment_ids.data.map(({ data: { amount, payment_form, journal_id }  }) => ({
             type: payment_form === "bank" ? "check" : payment_form,
