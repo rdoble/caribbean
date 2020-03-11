@@ -16,11 +16,11 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           invoice_line_ids,
           ipf_host,
           payment_ids,
-          amount_total,
           comment,
           ipf_type,
           ipf_print_copy_number,
-          residual
+          residual,
+          origin_out
         } = event.data.record.data;
 
         const comments_array = [];
@@ -49,12 +49,12 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             }
           }
         }
-        console.log(event.data.record.data)
+
         const ipf_invoice = {
           type: sale_fiscal_type,
           cashier: user_id.data.id,
           subsidiary: 1,
-          ncf: "00000000" + reference,
+          ncf: `00000000${reference}`,
           client: partner_id.data.display_name.split("\n")[0],
           rnc: partner_vat || '',
           items: invoice_line_ids.data.map(({ data: {
@@ -74,7 +74,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
                 .replace(/['"]+/g, '')
                 .slice(0, 40),
               quantity: quantity,
-              price: price_unit,
+              price: price_unit.toFixed(2),
               itbis: tax_amount,
             };
 
@@ -101,6 +101,25 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             description: "Credito",
             amount: residual
           });
+        }
+
+        const items_total = ipf_invoice.items.reduce((total, item) => 
+          total + (item.price * item.quantity)
+        , 0);
+
+        const payments_total = ipf_invoice.payments.reduce((total, payment) =>
+          total + parseFloat(payment.amount)
+        , 0);
+
+        if (items_total != payments_total) {
+          const delta_payment = items_total - payments_total
+          const last_payment = ipf_invoice.payments.pop();
+          last_payment.amount = (parseFloat(last_payment.amount) + delta_payment).toFixed(2);
+          ipf_invoice.payments.push(last_payment);
+        }
+
+        if (origin_out) {
+          ipf_invoice.reference_ncf = `00000000${origin_out}`;
         }
 
         if (ipf_print_copy_number == 1 && ipf_type === 'epson') {
