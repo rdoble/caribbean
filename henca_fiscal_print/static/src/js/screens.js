@@ -19,7 +19,8 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           amount_total,
           comment,
           ipf_type,
-          ipf_print_copy_number
+          ipf_print_copy_number,
+          residual
         } = event.data.record.data;
 
         const comments_array = [];
@@ -48,7 +49,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             }
           }
         }
-
+        console.log(event.data.record.data)
         const ipf_invoice = {
           type: sale_fiscal_type,
           cashier: user_id.data.id,
@@ -83,15 +84,23 @@ odoo.define('henca_fiscal_print.screens', function (require) {
 
             return ipf_line;
           }),
-          payments: payment_ids.data.length > 0 ? payment_ids.data.map(({ data: { amount, payment_form, journal_id }  }) => ({
+          payments: payment_ids.data.map(({ data: { amount, payment_form, journal_id }  }) => ({
             type: payment_form === "bank" ? "check" : payment_form,
             amount: amount.toFixed(2),
             description: journal_id.data.display_name
-          })) : [{ type: "credit", description: "Credito", amount: amount_total }],
+          })),
           comments: [
             'No. Documento:' + ' ' + number,
             ...comments_array
           ]
+        }
+
+        if (residual) {
+          ipf_invoice.payments.push({
+            type: "credit",
+            description: "Credito",
+            amount: residual
+          });
         }
 
         if (ipf_print_copy_number == 1 && ipf_type === 'epson') {
