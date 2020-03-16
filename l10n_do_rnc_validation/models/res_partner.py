@@ -69,7 +69,7 @@ class ResPartner(models.Model):
                     'rnc.indexa.api.url')
                 response = requests.get(
                     api_url, {'rnc': vat},
-                    headers={'x-access-token': 'bc57f086-476b-4979-8f66-b0cb2e19c1a0'}
+                    headers={'x-access-token': '559717c5-0d97-4f59-a72a-fb10fef42dc7'}
                 )
             except requests.exceptions.ConnectionError as e:
                 _logger.warning('API requests return the following '
