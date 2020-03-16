@@ -2,10 +2,7 @@
 #  Copyright (c) 2018 - Indexa SRL. (https://www.indexa.do) <info@indexa.do>
 #  See LICENSE file for full licensing details.
 
-import logging
 from odoo.tests.common import TransactionCase
-
-_logger = logging.getLogger(__name__)
 
 
 class CurrencyTestCase(TransactionCase):
@@ -24,12 +21,8 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco Popular")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco Popular")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
 
     def test_l10n_do_currency_update_bnr(self):
         """ Banco de Reservas currency update test """
@@ -39,12 +32,8 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco de Reservas")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco de Reservas")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
 
     def test_l10n_do_currency_update_bpr(self):
         """ Banco del Progreso currency update test """
@@ -54,12 +43,8 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco del Progreso")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco del Progreso")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
 
     def test_l10n_do_currency_update_bsc(self):
         """ Banco Santa Cruz currency update test """
@@ -69,12 +54,8 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco Santa Cruz")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco Santa Cruz")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
 
     def test_l10n_do_currency_update_bdi(self):
         """ Banco BDI currency update test """
@@ -84,12 +65,8 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco BDI")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco BDI")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
 
     def test_l10n_do_currency_update_bpm(self):
         """ Banco Promerica currency update test """
@@ -99,12 +76,8 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco Promerica")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco Promerica")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
 
     def test_l10n_do_currency_update_bvm(self):
         """ Banco Vimenca currency update test """
@@ -114,9 +87,5 @@ class CurrencyTestCase(TransactionCase):
         self.test_company.currency_service_token = 'demotoken'
         rates_count = len(self.currency_usd.rate_ids)
         res = self.test_company.l10n_do_update_currency_rates()
-
-        if not res:
-            _logger.info("No data from Banco Vimenca")
-
-        if len(self.currency_usd.rate_ids) != (rates_count + 1):
-            _logger.info("No data from Banco Vimenca")
+        self.assertTrue(res)
+        self.assertEqual(len(self.currency_usd.rate_ids), rates_count + 1)
