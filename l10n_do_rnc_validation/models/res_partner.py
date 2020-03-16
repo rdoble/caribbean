@@ -67,9 +67,11 @@ class ResPartner(models.Model):
                              "of res.partner vat: %s" % vat)
                 api_url = self.env['ir.config_parameter'].sudo().get_param(
                     'rnc.indexa.api.url')
+                token = self.env['ir.config_parameter'].sudo().get_param(
+                    'rnc.indexa.api.token')
                 response = requests.get(
                     api_url, {'rnc': vat},
-                    headers={'x-access-token': '559717c5-0d97-4f59-a72a-fb10fef42dc7'}
+                    headers={'x-access-token': token}
                 )
             except requests.exceptions.ConnectionError as e:
                 _logger.warning('API requests return the following '
@@ -119,19 +121,19 @@ class ResPartner(models.Model):
                     "RNC/Ced is invalid for partner {}".format(self.name))
 
             partner_json = self.get_contact_data(number)
-            if partner_json and partner_json['data']:
+            if partner_json and partner_json.get('data'):
                 data = dict(partner_json['data'][0])
                 result['name'] = data['business_name']
                 result['vat'] = number
-                if not result.get('phone') and data['phone']:
+                if not result.get('phone') and data.get('phone'):
                     result['phone'] = data['phone']
                 if not result.get('street'):
                     address = ""
-                    if data['street']:
+                    if data.get('street'):
                         address += data['street']
-                    if data['street_number']:
+                    if data.get('street_number'):
                         address += ", " + data['street_number']
-                    if data['sector']:
+                    if data.get('sector'):
                         address += ", " + data['sector']
                     result['street'] = address
 
@@ -139,17 +141,21 @@ class ResPartner(models.Model):
                     result['is_company'] = True if is_rnc else False
 
             else:
-                dgii_vals = rnc.check_dgii(number)
+
+                try:
+                    dgii_vals = rnc.check_dgii(number)
+                except:
+                    pass
                 if dgii_vals is None:
                     if is_rnc:
                         self.sudo().message_post(
                             subject=_("%s vat request" % self.name),
                             body=_("External service could not find requested "
-                                    "contact data."))
+                                   "contact data."))
                     result['vat'] = number
                     # TODO this has to be done in l10n_do
                     # result['sale_fiscal_type'] = "final"
-                else:
+                elif dgii_vals:
                     result['name'] = dgii_vals.get('name', False)
                     result['vat'] = dgii_vals.get('rnc')
 
@@ -161,23 +167,16 @@ class ResPartner(models.Model):
 
     @api.onchange('name')
     def _onchange_partner_name(self):
-        if self.name:
-            result = self.validate_rnc_cedula(self.name)
-            if result:
-                self.name = result.get('name')
-                self.vat = result.get('vat')
-                if not self.phone:
-                    self.phone = result.get('phone')
-                if not self.street:
-                    self.street = result.get('street')
-                self.is_company = result.get('is_company', False)
-                # # TODO this has to be done in l10n_do
-                # self.sale_fiscal_type = result.get('sale_fiscal_type')
+        self.validate_vat_onchange(self.name)
 
     @api.onchange('vat')
     def _onchange_partner_vat(self):
-        if self.vat:
-            result = self.validate_rnc_cedula(self.vat)
+        self.validate_vat_onchange(self.vat)
+
+    @api.model
+    def validate_vat_onchange(self, vat):
+        if vat:
+            result = self.validate_rnc_cedula(vat)
             if result:
                 self.name = result.get('name')
                 self.vat = result.get('vat')
