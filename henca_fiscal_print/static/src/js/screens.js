@@ -109,6 +109,9 @@ odoo.define('henca_fiscal_print.screens', function (require) {
         }
 
         if (residual) {
+          if (!ipf_invoice.payments) {
+            ipf_invoice.payments = [];
+          }
           ipf_invoice.payments.push({
             type: 'credit',
             description: 'Credito',
