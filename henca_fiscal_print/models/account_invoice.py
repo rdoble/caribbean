@@ -38,12 +38,14 @@ class AccountInvoice(models.Model):
     )
 
     def _get_fiscal_printer(self):
-        ipf_printer_id = self.env['ipf.printer.config'].search([
-            ('user_ids', '=', self.user_id.id)
-        ])
-
-        if ipf_printer_id:
-            self.ipf_printer_id = ipf_printer_id[0]
+        for invoice in self:
+            if invoice.type in ['out_invoice', 'out_refund']:
+                ipf_printer_id = self.env['ipf.printer.config'].search([
+                    ('user_ids', '=', invoice.user_id.id)
+                ])
+        
+                if ipf_printer_id:
+                    invoice.ipf_printer_id = ipf_printer_id[0]
 
     partner_vat = fields.Char(
         string='RNC',
