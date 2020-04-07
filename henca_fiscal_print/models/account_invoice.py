@@ -38,12 +38,14 @@ class AccountInvoice(models.Model):
     )
 
     def _get_fiscal_printer(self):
-        ipf_printer_id = self.env['ipf.printer.config'].search([
-            ('user_ids', '=', self.user_id.id)
-        ])
-
-        if ipf_printer_id:
-            self.ipf_printer_id = ipf_printer_id[0]
+        for invoice in self:
+            if invoice.type in ['out_invoice', 'out_refund']:
+                ipf_printer_id = invoice.env['ipf.printer.config'].search([
+                    ('user_ids', '=', invoice.user_id.id)
+                ])
+        
+                if ipf_printer_id:
+                    invoice.ipf_printer_id = ipf_printer_id[0]
 
     partner_vat = fields.Char(
         string='RNC',
@@ -54,16 +56,17 @@ class AccountInvoice(models.Model):
     @api.model
     def _get_payments_vals(self):
         payment_vals = super(AccountInvoice, self)._get_payments_vals()
-        for payment in payment_vals:
-            if payment['account_payment_id']:
-                account_payment = self.env['account.payment'].browse(payment['account_payment_id'])
-                payment_form = account_payment.journal_id.payment_form 
-                payment_description = account_payment.journal_id.display_name
-            elif payment['invoice_id']:
-                payment_description = payment['ref']
-                payment_form = 'credit_note' if 'B04' in payment_description else 'other'
-            payment['ipf_payment_form'] = payment_form
-            payment['ipf_payment_description'] = payment_description
+        if self.type in ['out_invoice', 'out_refund']:
+            for payment in payment_vals:
+                if payment['account_payment_id']:
+                    account_payment = self.env['account.payment'].browse(payment['account_payment_id'])
+                    payment_form = account_payment.journal_id.payment_form 
+                    payment_description = account_payment.journal_id.display_name
+                elif payment['invoice_id']:
+                    payment_description = payment['ref']
+                    payment_form = 'credit_note' if 'B04' in payment_description else 'other'
+                payment['ipf_payment_form'] = payment_form
+                payment['ipf_payment_description'] = payment_description
         return payment_vals
 
     def ipf_fiscal_print(self):
