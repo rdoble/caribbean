@@ -58,6 +58,7 @@ class AccountInvoice(models.Model):
         payment_vals = super(AccountInvoice, self)._get_payments_vals()
         if self.type in ['out_invoice', 'out_refund']:
             for payment in payment_vals:
+                payment_form = False
                 if payment['account_payment_id']:
                     account_payment = self.env['account.payment'].browse(payment['account_payment_id'])
                     payment_form = account_payment.journal_id.payment_form 
