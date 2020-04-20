@@ -59,9 +59,10 @@ class AccountInvoice(models.Model):
         if self.type in ['out_invoice', 'out_refund']:
             for payment in payment_vals:
                 payment_form = False
+                payment_description = False
                 if payment['account_payment_id']:
                     account_payment = self.env['account.payment'].browse(payment['account_payment_id'])
-                    payment_form = account_payment.journal_id.payment_form 
+                    payment_form = account_payment.journal_id.payment_form
                     payment_description = account_payment.journal_id.display_name
                 elif payment['invoice_id']:
                     payment_description = payment['ref']
