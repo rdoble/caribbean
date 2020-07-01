@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="hr_expense_view_form_inherit_expenses_invoicing_custom" model="ir.ui.view">
+        <field name="name">hr_expense_view_form_inherit_expenses_invoicing_custom</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='reference']" position="attributes">
+                <attribute name="string">Referencia Factura / NCF</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='reference']" position="after">
+                <field name="supplier_id" domain="[('supplier', '=', True)]"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_hr_expense_sheet_form_inherit_expenses_invoicing_custom" model="ir.ui.view">
+        <field name="name">view_hr_expense_sheet_form_inherit_expenses_invoicing_custom</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header/button[@name='action_sheet_move_create']" position="attributes">
+                <attribute name="name">action_expense_invoice_create</attribute>
+                <attribute name="string">Crear facturas</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='%(hr_expense.hr_expense_sheet_register_payment_wizard_action)d']" position="attributes">
+                <attribute name="name">action_view_invoice_tree</attribute>
+                <attribute name="type">object</attribute>
+            </xpath>
+
+            <xpath expr="//notebook/page[1]" position="after">
+                <page name="invoices" string="Facturas">
+                    <field name="invoice_ids"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
