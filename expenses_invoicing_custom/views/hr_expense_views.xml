@@ -49,7 +49,6 @@
 
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="requires_ncf" readonly="1" />
-                <field name="reference" readonly="1" attrs="{'invisible': [('requires_ncf', '=', False)]}"  />
                 <field name="journal_id" required="1" domain="[('type', '=', 'purchase')]"/>
             </xpath>
 
