@@ -26,19 +26,50 @@ class AccountInvoice(models.Model):
         related='ipf_printer_id.host'
     )
 
-    def _get_fiscal_printer(self):
-        ipf_printer_id = self.env['ipf.printer.config'].search([
-            ('user_ids', '=', self.user_id.id)
-        ])
+    ipf_type = fields.Selection(
+        string="IPF Impresora",
+        readonly=True,
+        related='ipf_printer_id.ipf_type'
+    )
 
-        if ipf_printer_id:
-            self.ipf_printer_id = ipf_printer_id[0]
+    ipf_print_copy_number = fields.Integer(
+        string="Numero de Copias",
+        related='ipf_printer_id.print_copy_number'
+    )
+
+    def _get_fiscal_printer(self):
+        for invoice in self:
+            if invoice.type in ['out_invoice', 'out_refund']:
+                ipf_printer_id = invoice.env['ipf.printer.config'].search([
+                    ('user_ids', '=', invoice.user_id.id)
+                ])
+        
+                if ipf_printer_id:
+                    invoice.ipf_printer_id = ipf_printer_id[0]
 
     partner_vat = fields.Char(
         string='RNC',
         related='partner_id.vat',
         readonly=True
     )
+
+    @api.model
+    def _get_payments_vals(self):
+        payment_vals = super(AccountInvoice, self)._get_payments_vals()
+        if self.type in ['out_invoice', 'out_refund']:
+            for payment in payment_vals:
+                payment_form = False
+                payment_description = False
+                if payment['account_payment_id']:
+                    account_payment = self.env['account.payment'].browse(payment['account_payment_id'])
+                    payment_form = account_payment.journal_id.payment_form
+                    payment_description = account_payment.journal_id.display_name
+                elif payment['invoice_id']:
+                    payment_description = payment['ref']
+                    payment_form = 'credit_note' if 'B04' in payment_description else 'other'
+                payment['ipf_payment_form'] = payment_form
+                payment['ipf_payment_description'] = payment_description
+        return payment_vals
 
     def ipf_fiscal_print(self):
         pass

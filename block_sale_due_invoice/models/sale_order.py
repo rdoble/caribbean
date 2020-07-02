@@ -31,6 +31,7 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self, values):
 
+        self.ensure_one()
         res = super(SaleOrder, self).action_confirm()
 
         for rec in self:
@@ -54,7 +55,7 @@ class SaleOrder(models.Model):
 
                     for payterm in inv.payment_term_id.line_ids:
                         payterm_day = payterm.days
-                    
+                            
                     if (total_amount + rec.amount_total) > rec.partner_id.limit_amount and (d1-d2).days > payterm_day:
                         raise Warning(_("El cliente {} tiene pagos vencidos pendientes".format(inv.partner_id.name)))
 
