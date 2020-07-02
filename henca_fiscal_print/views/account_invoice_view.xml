@@ -22,9 +22,14 @@
                     <field name="fiscal_nif" attrs="{'invisible': [('fiscal_nif','=','false')]}"/>
                     <field name="partner_vat" />
                     <field name="ipf_printer_id" />
+                    <field name="payment_ids" widget='one2many'>
+                        <tree>
+                            <field name='journal_id'/>
+                            <field name='amount'/>
+                            <field name='payment_form'/>
+                        </tree>
+                    </field>
                     <field name="ipf_host" invisible="1" />
-                    <field name="ipf_print_copy_number" invisible="1" />
-                    <field name="ipf_type" invisible="1" />
                 </field>
             </field>
         </record>

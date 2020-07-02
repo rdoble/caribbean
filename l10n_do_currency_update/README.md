@@ -21,12 +21,17 @@ Accounting Settings
 * Activate Multi-currency feature
 * Setup your company Dominican Bank Rates parameters like bank, interval, base and offset
 
-Technical Settings
-------------------
+Company Settings
+----------------
 
-You need to setup your API Key in order to authenticate with the external service.
-* Go to Settings > Technical > Parameters > System Parameters
-* Set your Key on `indexa.api.token` param record value
+For this module fetch data from given API, you must setup a service authentication token for each company
+
+* Go to Settings > Users & Companies > Companies
+* Select one or more companies from your companies tree view
+* Click on Action > Set token
+
+Technical Settings
+----------------
 
 You can setup the time when your currency update action will run
 
