@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from datetime import date
+
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"
@@ -37,6 +39,32 @@ class AccountInvoice(models.Model):
         related='ipf_printer_id.print_copy_number'
     )
 
+    invoice_date_currency_rate = fields.Float(
+        string="Tasa de Cambio Fecha Factura",
+        compute="_get_invoice_date_currency_rate"
+    )
+
+    dop_currency_id = fields.Many2one(
+        comodel_name='res.currency',
+        default=lambda self: self.env.ref('base.DOP').id,
+        string='DOP Currency ID',
+        readonly=True
+    )
+
+    @api.depends('date_invoice', 'currency_id')
+    def _get_invoice_date_currency_rate(self):
+        if self.dop_currency_id.id != self.currency_id.id:
+            # If date not specified on the invoice default to today's date
+            invoice_date = self.date_invoice if self.date_invoice else date.today()
+            currency_rates = self.env['res.currency.rate'].search([
+                ('company_id', '=', self.company_id.id),
+                ('currency_id', '=', self.currency_id.id),
+                ('name', '<=', invoice_date)
+            ], order='name asc')
+
+            rate = currency_rates[-1].rate if currency_rates else 1
+            self.invoice_date_currency_rate = rate
+
     def _get_fiscal_printer(self):
         for invoice in self:
             if invoice.type in ['out_invoice', 'out_refund']:
@@ -58,15 +86,19 @@ class AccountInvoice(models.Model):
         payment_vals = super(AccountInvoice, self)._get_payments_vals()
         if self.type in ['out_invoice', 'out_refund']:
             for payment in payment_vals:
+                payment_form = False
+                payment_description = False
                 if payment['account_payment_id']:
                     account_payment = self.env['account.payment'].browse(payment['account_payment_id'])
-                    payment_form = account_payment.journal_id.payment_form 
+                    payment_form = account_payment.journal_id.payment_form
                     payment_description = account_payment.journal_id.display_name
+                    payment['ipf_payment_form'] = payment_form
+                    payment['ipf_payment_description'] = payment_description
                 elif payment['invoice_id']:
                     payment_description = payment['ref']
                     payment_form = 'credit_note' if 'B04' in payment_description else 'other'
-                payment['ipf_payment_form'] = payment_form
-                payment['ipf_payment_description'] = payment_description
+                    payment['ipf_payment_form'] = payment_form
+                    payment['ipf_payment_description'] = payment_description
         return payment_vals
 
     def ipf_fiscal_print(self):
@@ -74,6 +106,11 @@ class AccountInvoice(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
+
+    invoice_date_currency_rate = fields.Float(
+        related='invoice_id.invoice_date_currency_rate',
+        string='Tasa'
+    )
 
     tax_amount_type = fields.Char(
         string='Tax Computation',

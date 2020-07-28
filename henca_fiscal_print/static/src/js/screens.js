@@ -19,7 +19,9 @@ odoo.define('henca_fiscal_print.screens', function (require) {
           ipf_print_copy_number,
           residual,
           origin_out,
-          payments_widget
+          payments_widget,
+          currency_id,
+          dop_currency_id
         } = event.data.record.data;
 
         console.log(event.data.record.data);
@@ -67,10 +69,16 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             price_unit,
             tax_amount,
             tax_amount_type,
-            discount
+            discount,
+            currency_id,
+            invoice_date_currency_rate
           } }) => {
+            if (currency_id.data.id != dop_currency_id.data.id) {
+              // console.log("Not peso")
+              price_unit = 1 / invoice_date_currency_rate * price_unit;
+            }
             if (tax_amount_type === 'percent') {
-              price_unit *= (tax_amount / 100.0 + 1)
+              price_unit *= (tax_amount / 100.0 + 1);
             }
             const ipf_line = {
               description: name
@@ -103,7 +111,7 @@ odoo.define('henca_fiscal_print.screens', function (require) {
             ipf_payment_description
           }) => ({
             amount,
-            type: ipf_payment_form,
+            type: ipf_payment_form === 'bank' ? 'check' :  ipf_payment_form,
             description: ipf_payment_description
           }));
         }
