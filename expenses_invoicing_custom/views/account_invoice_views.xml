@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="invoice_supplier_form_inherit_expenses_invoicing_custom" model="ir.ui.view">
+        <field name="name">invoice_supplier_form_inherit_expenses_invoicing_custom</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='date_due']" position="after">
+                <field name="expense_sheet_id" readonly="1" attrs="{'invisible': [('expense_sheet_id', '=', False)]}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>
