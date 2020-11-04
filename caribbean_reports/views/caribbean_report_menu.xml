@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="caribbean_reporte_root" 
+	    	  name="Reportes Andrickson" />
+
+    <menuitem id="caribbean_reporte_products_menu" 
+            name="Reportes" 
+            parent="caribbean_reporte_root" 
+            action="caribbean_reporte_action" />
+
+    <menuitem id="caribbean_reporte_setting_sub_menu" 
+	    	  name="Configuraciones" 
+	    	  parent="caribbean_reporte_root" 
+	    	  action="caribbean_reporte_setting_action"/>
+
+</odoo>

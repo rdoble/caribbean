@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="caribbean_reporte_setting_form" model="ir.ui.view">
+        <field name="name">caribbean.report.setting.form</field>
+        <field name="model">caribbean.report.setting</field>
+        <field name="arch" type="xml">
+			<form string="Configuracion Reportes">
+			    <group col="2">
+			        <field name="name"/>
+			    </group>
+
+                <notebook>
+                    <page string="SELECT">
+                        <field name="query" />
+                    </page>
+
+                    <page string="WHERE">
+                        <field name="where" />
+                    </page>
+
+                    <page string="GROUP BY">
+                        <field name="group_by" />
+                    </page>
+
+                    <page string="ORDER BY">
+                        <field name="order_by" />
+                    </page>
+
+                </notebook>
+			</form>
+        </field>
+    </record>
+
+    <record id="caribbean_reporte_setting_action" model="ir.actions.act_window">
+    	<field name="name">Configuracion Reportes</field>
+    	<field name="res_model">caribbean.report.setting</field>
+    	<field name="view_type">form</field>
+    	<field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
