@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="caribbean_reporte_root" 
-	    	  name="Reportes Andrickson" />
+	    	  name="Reportes SQL" />
 
     <menuitem id="caribbean_reporte_products_menu" 
             name="Reportes" 

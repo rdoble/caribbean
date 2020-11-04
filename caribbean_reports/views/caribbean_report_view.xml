@@ -5,7 +5,7 @@
         <field name="name">caribbean.report.form</field>
         <field name="model">caribbean.report</field>
         <field name="arch" type="xml">
-			<form string="Reportes Andrickson">
+			<form string="Reportes SQL">
                 <header>
                     <button name="btn_generate_report" string="Generar Reporte" type="object" class="btn-primary"/>
                 </header>
@@ -28,7 +28,7 @@
         <field name="name">caribbean.report.tree</field>
         <field name="model">caribbean.report</field>
         <field name="arch" type="xml">
-            <tree string="Reportes de Andrickson">
+            <tree string="Reportes de SQL">
                 <field name="report_id" />
                 <field name="name"/>
                 <field name="date_from" />
@@ -38,7 +38,7 @@
     </record>
 
     <record id="caribbean_reporte_action" model="ir.actions.act_window">
-    	<field name="name">Reportes Andrickson</field>
+    	<field name="name">Reportes SQL</field>
     	<field name="res_model">caribbean.report</field>
     	<field name="view_type">form</field>
     	<field name="view_mode">tree,form</field>

@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 
 class CaribbeanReport(models.Model):
     _name = 'caribbean.report'
-    _description = 'Modulo para la creacion de los reportes de Andrickson'
+    _description = 'Modulo para la creacion de los reportes avanzados con SQL'
 
     name = fields.Char(string='Nombre del Reporte')
     report_file_binary = fields.Binary(string='Archivo')
@@ -59,7 +59,7 @@ class CaribbeanReport(models.Model):
 
 class CaribbeanReportSetting(models.Model):
     _name = 'caribbean.report.setting'
-    _description = 'Configuracion de los reportes Andrickson'
+    _description = 'Configuracion de los reportes'
 
     name = fields.Char(string="Nombre reporte", required=True)
     query = fields.Text(string='Query')
