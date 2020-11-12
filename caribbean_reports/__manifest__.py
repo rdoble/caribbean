@@ -16,6 +16,8 @@
         'views/caribbean_report_setting_view.xml',
         'views/caribbean_report_view.xml',
         'views/caribbean_report_menu.xml',
+        'security/caribbean_reports_security.xml',
+        'security/ir.model.access.csv',
     ],
     'images': '',
 }

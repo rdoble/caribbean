@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+caribbean_report,caribbean.report,model_caribbean_report,group_caribbean_reports_admin,1,1,1,1
+caribbean_report_setting,caribbean.report.setting,model_caribbean_report_setting,group_caribbean_reports_admin,1,1,1,1
+caribbean_report,caribbean.report,model_caribbean_report,group_caribbean_reports_user,1,0,0,0
+caribbean_report_setting,caribbean.report.setting,model_caribbean_report_setting,group_caribbean_reports_user,1,1,1,1
