@@ -17,10 +17,10 @@
     """,
     'author': "Grupo Consultoria Henca, Jorge Miguel Hernandez Santos(dev.jhernandez@gmail.com)",
     'category': 'Fiscal',
-    'version': '12.0',
+    'version': '13.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'account', 'ncf_manager'],
+    'depends': ['base', 'web', 'account', 'l10n_do_accounting'],
 
     # always loaded
      'data': [
