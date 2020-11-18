@@ -1,0 +1,139 @@
+<odoo>
+    <data>
+        <record id="henca_printer_config_tree" model="ir.ui.view">
+            <field name="name">Impresoras Fiscales</field>
+            <field name="model">ipf.printer.config</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Impresoras Fiscales">
+                    <field name="name"/>
+                    <field name="serial"/>
+                    <field name="subsidiary"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="ipf_printer_config_form_view" model="ir.ui.view">
+            <field name="name">Impresora Fiscal</field>
+            <field name="model">ipf.printer.config</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Impresora Fiscal">
+                    <header>
+                        <button name="z_close_print" custom="z_close_print" string="Imprimir Cierre Z" type="object" class="btn-primary"/>
+                        <button name="get_x" custom="get_x" string="Imprimir Cierre X" type="object" class="btn-primary"/>
+                        <button name="get_state" custom="get_state" string="Obtener Estado" type="object" class="btn-primary"/>
+                        <button name="get_serial" custom="get_serial" string="Configurar Serial" type="object" class="btn-primary"/>
+                        <button name="get_information_day" custom="get_information_day" string="Mostrar reporte del dia" type="object" class="btn-primary"/>
+                        <button name="get_advance_paper" custom="get_advance_paper" string="Avanzar Papel" type="object" class="btn-primary"/>
+                        <button name="get_new_shift_print" custom="get_new_shift_print" string="Crear nuevo reporte de turno" type="object"/>
+                        <button name="get_information_shift" custom="get_information_shift" string="Mostrar reporte del turno actual" type="object"/>
+                        <button name="get_printer_information" custom="get_printer_information" string="Obtener Informacion de la impresora" type="object" class="btn-primary"/>
+                        <button name="get_cut_paper" custom="get_cut_paper" string="Cortar Papel" type="object" class="btn-primary"/>
+                        <button name="get_daily_book" custom="get_daily_book" string="Obtener libro del dia" type="object" class="btn-primary"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-check">
+                                <field name="active" widget="boolean_button" options='{"terminology": "active"}'/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="host"/>
+                                <field name="user_ids" widget="many2many_tags" />
+                                <field name="print_copy_number"/>
+                            </group>
+                            <group>
+                                <field name="subsidiary"/>
+                                <field name="serial"/>
+                                <field name="ipf_type"/>
+                            </group>
+                        </group>
+                    </sheet>
+
+                    <notebook>
+                        <page string="Libros diarios">
+                            <field name="daily_book_ids"/>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record id="hencal_fiscal_print" model="ir.actions.act_window">
+            <field name="name">Impresoras Fiscales </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ipf.printer.config</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="henca_printer_config_tree"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Impresoras Fiscales
+                </p>
+                <p>
+                    Aqui se listaran todos las impresoras fiscales instaladas.
+                </p>
+            </field>
+        </record>
+
+
+    
+        <record id="marcos_ipf_daily_book_tree" model="ir.ui.view">
+            <field name="name">marcos ipf daily book tree</field>
+            <field name="model">ipf.daily.book</field>
+            <field name="arch" type="xml">
+                <tree string="Libros diarios" create="0">
+                    <field name="printer_id"/>
+                    <field name="serial"/>
+                    <field name="date"/>
+                    <field name="filename" readonly="1" invisible="1"/>
+                    <field name="book" readonly="1" filename="filename"/>
+
+                    <field name="doc_qty"/>
+                    <field name="total"/>
+                    <field name="total_tax"/>
+                    <field name="final_total"/>
+                    <field name="final_total_tax"/>
+                    <field name="fiscal_total"/>
+                    <field name="fiscal_total_tax"/>
+                    <field name="ncfinal_total"/>
+                    <field name="ncfinal_total_tax"/>
+                    <field name="ncfiscal_total"/>
+                    <field name="ncfiscal_total_tax"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="marcos_ipf_daily_book_action" model="ir.actions.act_window">
+            <field name="name">Libros diarios</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ipf.daily.book</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Libros diarios
+                </p>
+                <p>
+                    Aqui se listaran todos los libros diarios generados.
+                </p>
+            </field>
+        </record>
+
+
+
+        <!-- This Menu Item Must have a parent -->
+		<menuitem id="henca_account_fiscal_menu" name="Impresoras Fiscales" parent="account.menu_finance_entries" sequence="5"
+              groups="account.group_account_user"
+              action="hencal_fiscal_print"/>
+
+        <menuitem id="marcos_ipf_daily_book_menu" parent="account.menu_finance_entries"
+              action="marcos_ipf_daily_book_action" sequence="6"/>
+
+    </data>
+</odoo>
