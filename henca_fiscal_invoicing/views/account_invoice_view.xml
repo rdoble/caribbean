@@ -2,22 +2,23 @@
 <odoo>
     <data>
 
-        <record id="ncf_manager_account_invoice_inherit_form" model="ir.ui.view">
-            <field name="name">ncf_manager_account_invoice_inherit_form</field>
+        <record id="ncf_henca_fiscal_account_invoice_inherit_form" model="ir.ui.view">
+            <field name="name">ncf_henca_fiscal_account_invoice_inherit_form</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
                     <attribute name="string">Imprimir PDF</attribute>
                 </xpath>
-                <xpath expr="//header/button[@name='action_invoice_sent']" position="after">
-                    <button id="fiscal_print" custom="fiscal_print" name="ipf_fiscal_print" string="Fiscal Print" type="object" class="btn-primary"/>
+                <xpath expr="//button[@name='action_invoice_open']" position="after">
+                    <button id="fiscal_print" custom="fiscal_print" name="ipf_fiscal_print" string="Imprimir Fiscal" type="object" class="btn-primary" attrs="{'invisible': ['|','|',('fiscal_printed','=',True),('show_print_fiscal','=',False),('state','in',('draft','cancel'))]}"/>
                 </xpath>
-                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="after">
-                    <field name="tax_amount_type" attrs="{'invisible':True}"/>
-                    <field name="tax_amount" attrs="{'invisible':True}"/>
-                    <field name="invoice_date_currency_rate" attrs="{'invisible':True}"/>
-                </xpath>
+
+               <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="after">
+                   <field name="tax_amount_type" invisible="1" force_save="1"/>
+                   <field name="tax_amount"  invisible="1" force_save="1"/>
+                   <field name="invoice_date_currency_rate" invisible="1"/>
+               </xpath>
 
                 <field name="move_id" position="after">
                     <field name="fiscal_nif" attrs="{'invisible': [('fiscal_nif','=','false')]}"/>
@@ -28,6 +29,12 @@
                     <field name="ipf_host" invisible="1" />
                     <field name="ipf_print_copy_number" invisible="1" />
                     <field name="ipf_type" invisible="1" />
+                    <field name="fiscal_printed" invisible="1" />
+                    <field name="show_print_fiscal" invisible="1" />
+
+                    
+
+                    
                 </field>
             </field>
         </record>
