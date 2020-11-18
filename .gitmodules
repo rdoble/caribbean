@@ -1,4 +1,0 @@
-[submodule "henca_fiscal_invoicing"]
-	path = henca_fiscal_invoicing
-	url = git@gitlab.consultoriahenca.com:jhernandez/henca_fiscal_invoicing.git
-	branch = 12.0
