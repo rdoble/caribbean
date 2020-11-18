@@ -10,10 +10,10 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
       if (event.data.attrs.custom === "fiscal_print") {
 
         const {
-          name,
-          l10n_latam_document_type_id,
-          invoice_user_id,
-          ref,
+          number,
+          sale_fiscal_type,
+          user_id,
+          reference,
           partner_id,
           partner_vat,
           invoice_line_ids,
@@ -21,16 +21,16 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
           comment,
           ipf_type,
           ipf_print_copy_number,
-          amount_residual,
-          l10n_do_origin_ncf,
-          invoice_payments_widget,
+          residual,
+          origin_out,
+          payments_widget,
           currency_id,
           dop_currency_id
         } = event.data.record.data;
 
         console.log(event.data.record.data);
-        console.log(event.data.record.data.invoice_payments_widget);
-        console.log(JSON.parse(invoice_payments_widget))
+        console.log(event.data.record.data.payments_widget);
+        console.log(JSON.parse(payments_widget))
 
 
         const comments_array = [];
@@ -66,10 +66,10 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
         console.log(invoice_line_ids.data);
         // let ncf = "B0100040012"
         const ipf_invoice = {
-          type: this.getFiscalType(ref),
-          cashier: invoice_user_id.data.id,
+          type: sale_fiscal_type,
+          cashier: user_id.data.id,
           subsidiary: 1,
-          ncf: `00000000${ref}`,
+          ncf: `00000000${reference}`,
           client: partner_id.data.display_name.split("\n")[0],
           rnc: partner_vat || '',
           items: invoice_line_ids.data.map(({
@@ -117,12 +117,12 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
             return ipf_line;
           }),
           comments: [
-            'No. Documento:' + ' ' + name,
+            'No. Documento:' + ' ' + number,
             ...comments_array
           ]
         }
 
-        const other_payments = JSON.parse(invoice_payments_widget).content;
+        const other_payments = JSON.parse(payments_widget).content;
         console.log(other_payments)
         if (other_payments) {
           ipf_invoice.payments = other_payments.map(({
@@ -135,14 +135,14 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
             description: ipf_payment_description
           }));
         }
-        if (amount_residual) {
+        if (residual) {
           if (!ipf_invoice.payments) {
             ipf_invoice.payments = [];
           }
           ipf_invoice.payments.push({
             type: 'credit',
             description: 'Credito',
-            amount: amount_residual
+            amount: residual
           });
         }
 
@@ -161,9 +161,9 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
           ipf_invoice.payments.push(last_payment);
         }
 
-        if (l10n_do_origin_ncf) {
-          ipf_invoice.reference_ncf = `00000000${l10n_do_origin_ncf}`;
-          const origin_prefix = l10n_do_origin_ncf.slice(0, 3);
+        if (origin_out) {
+          ipf_invoice.reference_ncf = `00000000${origin_out}`;
+          const origin_prefix = origin_out.slice(0, 3);
           switch (origin_prefix) {
             case 'B02':
               ipf_invoice.type = 'final_note';
@@ -369,7 +369,7 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
       }
 
       rpc.query({
-        model: 'account.move',
+        model: 'account.invoice',
         method: 'action_invoice_printed',
         args: [invoice_id, fiscal_nif]
       }).then(() => {
@@ -567,7 +567,6 @@ odoo.define('henca_fiscal_invoicing.screens', function (require) {
               args: [serial]
             }).then(function (data) {
               if (data) {
-
                 self.reload();
                 // self.showDialog("Extracción libro diario", "El libro de diario fue generado satisfactoriamente.");
               }
