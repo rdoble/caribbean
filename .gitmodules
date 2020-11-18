@@ -1,4 +1,0 @@
-[submodule "juhenriquez/henca_fiscal_invoicing"]
-	path = juhenriquez/henca_fiscal_invoicing
-	url = git@github.com:juhenriquez/henca_fiscal_invoicing.git
-	branch = master
