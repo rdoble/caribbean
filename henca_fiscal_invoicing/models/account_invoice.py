@@ -84,7 +84,7 @@ class AccountInvoice(models.Model):
                 move.show_print_fiscal = False
 
             for line in move.invoice_line_ids:
-                if line.tax_amount_type == False:
+                if line.tax_amount_type == False or line.tax_amount_type == "":
                     line._compute_tax_amount_and_type()
 
     @api.model
