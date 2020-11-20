@@ -83,10 +83,6 @@ class AccountInvoice(models.Model):
             else:
                 move.show_print_fiscal = False
 
-            for line in move.invoice_line_ids:
-                if line.tax_amount_type == False or line.tax_amount_type == "":
-                    line._compute_tax_amount_and_type()
-
     @api.model
     def action_invoice_printed(self, invoice_id, fiscal_nif):
         if invoice_id:
@@ -130,13 +126,11 @@ class AccountInvoiceLine(models.Model):
     tax_amount_type = fields.Char(
         string='Tax Computation',
         compute='_compute_tax_amount_and_type',
-        store=True,
         readonly=True,
     )
     tax_amount = fields.Float(
         string='Tax Amount',
         compute='_compute_tax_amount_and_type',
-        store=True,
         readonly=True,
     )
 
