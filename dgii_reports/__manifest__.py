@@ -22,14 +22,14 @@
 
     # always loaded
     'data': [
-#         'data/invoice_service_type_detail_data.xml',
-#         'security/ir.model.access.csv',
-#         'security/ir_rule.xml',
-#         'views/res_partner_views.xml',
-#         'views/account_account_views.xml',
-#         'views/account_invoice_views.xml',
-#         'views/dgii_report_views.xml',
-#         'views/dgii_report_templates.xml',
-#         'wizard/dgii_report_regenerate_wizard_views.xml',
+        'data/invoice_service_type_detail_data.xml',
+        'security/ir.model.access.csv',
+        'security/ir_rule.xml',
+        'views/res_partner_views.xml',
+        'views/account_account_views.xml',
+        'views/account_invoice_views.xml',
+        'views/dgii_report_views.xml',
+        'views/dgii_report_templates.xml',
+        'wizard/dgii_report_regenerate_wizard_views.xml',
     ],
 }
