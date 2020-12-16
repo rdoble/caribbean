@@ -570,13 +570,17 @@ class DgiiReport(models.Model):
                     key = payment_id.journal_id.payment_form
                     if key:
                         if self.include_payment(invoice_id, payment_id):
-                            payments_dict[
-                                key] += self._convert_to_user_currency(
-                                    invoice_id.currency_id, invoice_id.date, payment['amount'])
+                            payments_dict[key] += self._convert_to_user_currency(
+                                invoice_id.currency_id,
+                                invoice_id.date,
+                                payment['amount'],
+                            )
                         else:
-                            payments_dict[
-                                'credit'] += self._convert_to_user_currency(
-                                    invoice_id.currency_id, invoice_id.date, payment['amount'])
+                            payments_dict['credit'] += self._convert_to_user_currency(
+                                invoice_id.currency_id,
+                                invoice_id.date,
+                                payment['amount'],
+                            )
                 else:
                     payments_dict['swap'] += self._convert_to_user_currency(
                         invoice_id.currency_id, invoice_id.date, payment['amount'])
@@ -1106,15 +1110,30 @@ class DgiiReport(models.Model):
                     inv.fiscal_status = 'done'
                     continue
 
-                if self._has_withholding(inv):
+                if self._has_withholding(inv) or not inv.payment_date:
                     inv.fiscal_status = 'normal'
                 else:
                     inv.fiscal_status = 'done'
+
+    def update_pending_invoices(self):
+        """
+        Some invoices which fiscal status is Partial may not update its status to
+        Reported because they don't have any withholding in its payments. Those invoices
+        are searched and updated in this function.
+        """
+
+        invoice_ids = self.env["account.invoice"].search([
+            ("state", "=", "paid"),
+            ("fiscal_status", "=", "normal"),
+            ("payment_date", "=", False),
+        ])
+        invoice_ids.write({"fiscal_status": "done"})
 
     @api.multi
     def state_sent(self):
         for report in self:
             report._invoice_status_sent()
+            report.update_pending_invoices()
             report.state = 'sent'
 
     def get_606_tree_view(self):

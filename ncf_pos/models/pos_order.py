@@ -92,11 +92,14 @@ class PosOrder(models.Model):
         for order in self:
             if not order.ncf_control:
                 return super(PosOrder, self).test_paid()
+            elif order.is_return_order:
+                return True
             else:
-                if order.is_return_order:
-                    return True
-                else:
-                    return super(PosOrder, self).test_paid()
+                if (not order.lines) or \
+                        (not order.statement_ids and
+                         not order.refund_payment_account_move_line_ids):
+                    return False
+                return True
 
     def check_ncf_control_from_ui(self, orders):
         """
@@ -152,10 +155,7 @@ class PosOrder(models.Model):
         for record in self:
             if record.refund_payment_account_move_line_ids:
                 for aml in record.refund_payment_account_move_line_ids:
-                    for p_id in aml.invoice_id.payment_move_line_ids.ids:
-                        if record.invoice_id:
-                            record.invoice_id[0].assign_outstanding_credit(
-                                p_id)
+                    record.invoice_id.assign_outstanding_credit(aml.id)
             if record.is_return_order:
                 record.invoice_id.write({
                     'origin_out': record.return_order_id.invoice_id.reference,
@@ -189,8 +189,9 @@ class PosOrder(models.Model):
             limit = today - timedelta(days=day_limit)
             invoice_domain.append(('date_invoice', '>=', limit))
 
-        if invoice_id:
-            invoice_domain.append(('id', '>', invoice_id))
+        # TODO: Maybe we don't need
+        # if invoice_id:
+        #     invoice_domain.append(('id', '>', invoice_id))
 
         if config_id:
             pos_order_domain.append(('config_id', '=', config_id))
@@ -237,8 +238,12 @@ class PosOrder(models.Model):
                     "price_subtotal_incl": line.price_subtotal_incl,
                     "qty": line.qty,
                     "price_unit": line.price_unit,
-                    "product_id": [line.product_id.id, line.product_id.name],
-                    "line_qty_returned": line.line_qty_returned
+                    "product_id": [
+                        line.product_id.id,
+                        line.product_id.name,
+                        [tax.id for tax in line.tax_ids_after_fiscal_position],
+                    ],
+                    "line_qty_returned": line.line_qty_returned,
                 }
                 order_lines_list.append(order_lines_json)
             # order_json["lines"] = order_lines_list
@@ -319,8 +324,10 @@ class PosOrder(models.Model):
         else:
             payment_name = data.get("payment_name", False)
             if payment_name:
-                out_refund_invoice = self.env["account.invoice"].sudo().search(
-                    [('reference', '=', payment_name)])
+                out_refund_invoice = self.env["account.invoice"].sudo().search([
+                    ('reference', '=', payment_name),
+                    ('type', '=', 'out_refund'),
+                ])
                 if out_refund_invoice:
                     move_line_ids = out_refund_invoice.mapped(
                         'move_id.line_ids'

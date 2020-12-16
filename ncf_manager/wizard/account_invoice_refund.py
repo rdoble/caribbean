@@ -19,7 +19,7 @@
 import logging
 
 from odoo import models, api, fields, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError, AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -68,13 +68,15 @@ class AccountInvoiceRefund(models.TransientModel):
         # [('type', '=', 'out_refund'), ('id', 'in', [43L, 44L])]
         # The created refund invoice is the first invoice in the
         # ('id', 'in', ...) tupla
-        created_inv = [
-            x[2] for x in result['domain'] if x[0] == 'id' and x[1] == 'in'
-        ][0]
 
-        if mode == 'modify':
-            # Remove pairs ids, because they are new draft invoices
-            del created_inv[1::2]
+        created_inv = []
+        if mode != 'modify':
+            created_inv = [
+                x[2] for x in result['domain'] if x[0] == 'id' and x[1] == 'in'
+            ][0]
+        else:
+            inv_id = result.get('res_id', False)
+            created_inv.append(inv_id)
 
         if created_inv:
             for idx, refund_id in enumerate(created_inv):
@@ -126,6 +128,7 @@ class AccountInvoiceRefund(models.TransientModel):
                                 })
 
                 refund.write(vals)
+                refund._onchange_invoice_line_ids()
 
         return result
 
@@ -135,19 +138,36 @@ class AccountInvoiceRefund(models.TransientModel):
         if active_id:
             invoice = self.env["account.invoice"].browse(active_id)
 
+            if self.filter_refund != 'debit' \
+                    and invoice.company_id.country_id.code == "DO" \
+                    and invoice.journal_id.ncf_control \
+                    and not self.env.user.has_group(
+                    "ncf_manager.group_l10n_do_fiscal_credit_note"):
+                raise AccessError("No tiene permitido emitir Notas de Crédito Fiscales")
+            elif self.filter_refund == 'debit' \
+                    and invoice.company_id.country_id.code == "DO" \
+                    and invoice.journal_id.ncf_control \
+                    and not self.env.user.has_group(
+                    "ncf_manager.group_l10n_do_debit_note"):
+                raise AccessError("No tiene permitido emitir Notas de Débito")
+
             if self.supplier_ncf:
-                if self.filter_refund == 'debit' and self.supplier_ncf[
-                        -10:-8] != '03':
+                if self.filter_refund == 'debit' and (self.supplier_ncf[
+                        -10:-8] != '03' and self.supplier_ncf[1:3] != '33'):
                     raise ValidationError(
-                        _(u"Las Notas de Débito deben ser tipo 03, este NCF "
+                        _(u"Las Notas de Débito deben ser tipo 03 o 33, este NCF "
                           "no es de este tipo."))
-                elif self.filter_refund != 'debit' and self.supplier_ncf[
-                        -10:-8] != '04':
+                elif self.filter_refund != 'debit' and (self.supplier_ncf[
+                        -10:-8] != '04' and self.supplier_ncf[1:3] != '34'):
                     raise ValidationError(
-                        _(u"Las Notas de Crédito deben ser tipo 04, este NCF "
+                        _(u"Las Notas de Crédito deben ser tipo 04 o 34, este NCF "
                           "no es de este tipo."))
 
-            if self.supplier_ncf and invoice.journal_id.ncf_remote_validation:
+            if (
+                self.supplier_ncf
+                and invoice.journal_id.ncf_remote_validation
+                and len(self.supplier_ncf) == '9'
+            ):
                 if not ncf.check_dgii(invoice.partner_id.vat,
                                       self.supplier_ncf):
                     raise UserError(_(

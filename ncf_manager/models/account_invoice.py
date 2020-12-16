@@ -24,7 +24,7 @@
 import logging
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError, AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -45,7 +45,8 @@ class AccountInvoice(models.Model):
     @api.depends('journal_id', 'sale_fiscal_type')
     def _compute_sequence_almost_depleted(self):
         for invoice in self:
-            if invoice.journal_id.ncf_control and invoice.type == "out_invoice":
+            if invoice.journal_id.ncf_control and invoice.type == "out_invoice" and \
+               invoice.sale_fiscal_type:
                 sequence = invoice.journal_id.date_range_ids.filtered(
                     lambda seq: seq.sale_fiscal_type == invoice.
                     sale_fiscal_type)
@@ -57,7 +58,8 @@ class AccountInvoice(models.Model):
 
             if invoice.journal_id.purchase_type in (
                     'informal', 'minor',
-                    'exterior') and invoice.type == "in_invoice":
+                    'exterior') and invoice.type == "in_invoice" and \
+                    invoice.journal_id.purchase_type:
                 sequence = invoice.journal_id.date_range_ids.filtered(
                     lambda seq: seq.sale_fiscal_type == invoice.journal_id.
                     purchase_type)
@@ -162,7 +164,7 @@ class AccountInvoice(models.Model):
                                    compute=_get_rate,
                                    currency_field='currency_id')
 
-    is_nd = fields.Boolean()
+    is_nd = fields.Boolean("Es Nota de Débito")
     origin_out = fields.Char("Afecta a")
     ncf_expiration_date = fields.Date('Válido hasta',
                                       compute="_compute_ncf_expiration_date",
@@ -195,7 +197,7 @@ class AccountInvoice(models.Model):
     def validate_fiscal_purchase(self):
         NCF = self.reference if self.reference else None
         if NCF and self.journal_id.purchase_type == 'normal':
-            if NCF[-10:-8] == '02':
+            if NCF[-10:-8] == '02' or NCF[1:3] == '32':
                 raise ValidationError(_(
                     "NCF *{}* NO corresponde con el tipo de documento\n\n"
                     "No puede registrar Comprobantes Consumidor Final (02)")
@@ -270,7 +272,7 @@ class AccountInvoice(models.Model):
     def _onchange_partner_id(self):
         res = super(AccountInvoice, self)._onchange_partner_id()
         if self.partner_id and self.type == 'out_invoice':
-            if self.journal_id.ncf_control and not self.sale_fiscal_type:
+            if self.journal_id.ncf_control:
                 self.sale_fiscal_type = self.partner_id.sale_fiscal_type
                 self.special_check()
             if not self.partner_id.customer:
@@ -311,7 +313,8 @@ class AccountInvoice(models.Model):
                     'normal', 'informal',
                     'minor') or self.journal_id.ncf_control:
                 ncf = self.origin_out
-                if not ncf_validation.is_valid(ncf) and ncf[-10:-8] != '04':
+                if not ncf_validation.is_valid(ncf) and (
+                   ncf[-10:-8] != '04' or ncf[1:3] != '34'):
                     raise UserError(_(
                         "NCF mal digitado\n\n"
                         "El comprobante *{}* no tiene la estructura correcta "
@@ -460,7 +463,8 @@ class AccountInvoice(models.Model):
         if self._context.get("credit_note_supplier_ncf", False):
             res.update({
                 "reference": self._context["credit_note_supplier_ncf"],
-                "origin_out": self.reference
+                "origin_out": self.reference,
+                "expense_type": self.expense_type
             })
         return res
 
@@ -510,3 +514,17 @@ class AccountInvoice(models.Model):
                         "vuelva a guardar la factura"))
 
         return super(AccountInvoice, self).create(vals)
+
+    @api.multi
+    def action_invoice_cancel(self):
+
+        fiscal_invoices = self.filtered(
+            lambda inv: inv.company_id.country_id.code == "DO"
+            and inv.journal_id.ncf_control
+        )
+        if fiscal_invoices and not self.env.user.has_group(
+                "ncf_manager.group_l10n_do_fiscal_invoice_cancel"
+        ):
+            raise AccessError("No tiene permitido cancelar Facturas Fiscales")
+
+        return super(AccountInvoice, self).action_invoice_cancel()
