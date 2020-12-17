@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="caribbean_hr_employee_commissions_form" model="ir.ui.view">
+        <field name="name">caribbean.hr.employee.commissions.form</field>
+        <field name="model">hr.employee</field>
+        <field name="priority">99</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='hr_settings']" position="inside">
+                <group>
+                    <group string="Ventas" name="commission_group">
+                        <field name="commission_id"/>
+                    </group>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

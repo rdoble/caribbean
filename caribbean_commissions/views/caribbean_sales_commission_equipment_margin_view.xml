@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="caribbean_sales_commission_equipment_margin_form" model="ir.ui.view">
+        <field name="name">caribbean.sales.commission.equipment.margin.form</field>
+        <field name="model">caribbean.sales.commission.equipment.margin</field>
+        <field name="arch" type="xml">
+            <form string="Comisión por margen de ganancia">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+
+                    <br />
+                    <h2>Configuración comisión por margen de ganancia</h2>
+
+                    <group col="4">
+                        <field name="initial_margin" />
+                        <field name="top_margin" />
+                        <field name="commission" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="caribbean_sales_commission_equipment_margin_tree" model="ir.ui.view">
+        <field name="name">caribbean.sales.commission.equipment.margin.tree</field>
+        <field name="model">caribbean.sales.commission.equipment.margin</field>
+        <field name="arch" type="xml">
+            <tree string="Comisiones por margen de ganancia">
+                <field name="name" />
+                <field name="initial_margin" />
+                <field name="top_margin" />
+                <field name="commission" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="caribbean_sales_commission_equipment_margin_action" model="ir.actions.act_window">
+        <field name="name">Comisiones por margen de ganancia</field>
+        <field name="res_model">caribbean.sales.commission.equipment.margin</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   
+    <menuitem id="caribbean_sales_commission_setting_menu" 
+            name="Comisiones de ventas" 
+            parent="caribbean_reports.caribbean_reporte_setting_menu" 
+            action="caribbean_sales_commission_setting_action" />
+
+    <menuitem id="caribbean_sales_commission_equipment_margin_menu" 
+            name="Comisiones por margen de ganancia" 
+            parent="caribbean_reports.caribbean_reporte_setting_menu" 
+            action="caribbean_sales_commission_equipment_margin_action" />
+    
+</odoo>
