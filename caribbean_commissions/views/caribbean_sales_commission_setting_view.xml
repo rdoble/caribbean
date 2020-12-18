@@ -30,7 +30,7 @@
                     </group>
                     <br />
                     
-                    <field name="equipment_category_ids" domain="[('parent_id', '=', equipment_category_id)]" widget="many2many_checkboxes" />
+                    <field name="equipment_category_ids" domain="['|', ('parent_id', '=', equipment_category_id), ('id', '=', equipment_category_id)]" widget="many2many_checkboxes" />
                 </sheet>
             </form>
         </field>
