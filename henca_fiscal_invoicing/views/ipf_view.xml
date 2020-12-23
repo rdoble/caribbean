@@ -31,6 +31,10 @@
                         <button name="get_printer_information" custom="get_printer_information" string="Obtener Informacion de la impresora" type="object" class="btn-primary"/>
                         <button name="get_cut_paper" custom="get_cut_paper" string="Cortar Papel" type="object" class="btn-primary"/>
                         <button name="get_daily_book" custom="get_daily_book" string="Obtener libro del dia" type="object" class="btn-primary"/>
+                        <button name="get_daily_book_by_date" custom="get_daily_book_by_date" string="Obtener libro del dia por rango de fecha" type="object" class="btn-primary"/>
+                        <button name="generate_monthly_book" custom="get_monthlybook" string="Generar libro mensual" type="object" class="btn-primary"/>
+
+                        
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -53,6 +57,8 @@
                                 <field name="subsidiary"/>
                                 <field name="serial"/>
                                 <field name="ipf_type"/>
+                                <field name="extension"/>
+                                
                             </group>
                         </group>
                     </sheet>
@@ -60,6 +66,9 @@
                     <notebook>
                         <page string="Libros diarios">
                             <field name="daily_book_ids"/>
+                        </page>
+                        <page string="Libros Mensuales">
+                            <field name="monthly_book_ids"/>
                         </page>
                     </notebook>
                 </form>
@@ -93,7 +102,34 @@
                     <field name="serial"/>
                     <field name="date"/>
                     <field name="filename" readonly="1" invisible="1"/>
-                    <field name="book" readonly="1" filename="filename"/>
+                    <field name="book" widget="binary"  readonly="1" filename="filename"/>
+
+                    <field name="doc_qty"/>
+                    <field name="total"/>
+                    <field name="total_tax"/>
+                    <field name="final_total"/>
+                    <field name="final_total_tax"/>
+                    <field name="fiscal_total"/>
+                    <field name="fiscal_total_tax"/>
+                    <field name="ncfinal_total"/>
+                    <field name="ncfinal_total_tax"/>
+                    <field name="ncfiscal_total"/>
+                    <field name="ncfiscal_total_tax"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="marcos_ipf_monthly_book_tree" model="ir.ui.view">
+            <field name="name">marcos ipf monthly book tree</field>
+            <field name="model">ipf.monthly.book</field>
+            <field name="arch" type="xml">
+                <tree string="Libros mensual" create="0">
+                    <field name="printer_id"/>
+                    <field name="serial"/>
+                    <field name="year"/>
+                    <field name="month"/>
+                    <field name="filename" readonly="1" invisible="1"/>
+                    <field name="book" widget="binary" readonly="1" filename="filename"/>
 
                     <field name="doc_qty"/>
                     <field name="total"/>
@@ -124,7 +160,22 @@
                 </p>
             </field>
         </record>
+        
 
+        <record id="marcos_ipf_monthly_book_action" model="ir.actions.act_window">
+            <field name="name">Libros mensuales</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ipf.monthly.book</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Libros mensuales
+                </p>
+                <p>
+                    Aqui se listaran todos los libros mensuales generados.
+                </p>
+            </field>
+        </record>
 
 
         <!-- This Menu Item Must have a parent -->
@@ -134,6 +185,9 @@
 
         <menuitem id="marcos_ipf_daily_book_menu" parent="account.menu_finance_entries"
               action="marcos_ipf_daily_book_action" sequence="6"/>
+        <menuitem id="marcos_ipf_monthly_book_menu" parent="account.menu_finance_entries"
+              action="marcos_ipf_monthly_book_action" sequence="7"/>
+              
 
     </data>
 </odoo>

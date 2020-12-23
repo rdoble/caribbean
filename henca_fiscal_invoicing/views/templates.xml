@@ -6,6 +6,7 @@
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/henca_fiscal_invoicing/static/src/libs/sweetalert2.js"></script>
                 <script type="text/javascript" src="/henca_fiscal_invoicing/static/src/libs/bootbox.min.js"></script>
+                <script type="text/javascript" src="/henca_fiscal_invoicing/static/src/libs/async.min.js"></script>
 		        <script type="text/javascript" src="/henca_fiscal_invoicing/static/src/libs/tingle.min.js"></script>
 		        <link rel="stylesheet" href="/henca_fiscal_invoicing/static/src/libs/tingle.min.css"></link>
                 <script type="text/javascript" src="/henca_fiscal_invoicing/static/src/js/invoicing.js"></script>
