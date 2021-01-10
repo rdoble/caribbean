@@ -13,6 +13,7 @@
     'version': '12.0',
     'depends': ['base', 'web', 'hr', 'caribbean_reports'],
     'data': [
+        'views/caribbean_colletion_commission_setting_view.xml',
         'views/caribbean_sales_commission_setting_view.xml',
         'views/caribbean_sales_commission_equipment_margin_view.xml',
         'views/caribbean_sales_commission_setting_menu.xml',

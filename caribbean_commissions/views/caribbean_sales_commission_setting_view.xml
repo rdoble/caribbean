@@ -5,42 +5,52 @@
         <field name="name">caribbean.sales.commission.setting.form</field>
         <field name="model">caribbean.sales.commission.setting</field>
         <field name="arch" type="xml">
-            <form string="Comisiones de ventas">
+            <form string="Comisiones">
                 <sheet>
                     <group>
                         <field name="name" />
                     </group>
+           
+                    <notebook>
+                        <page name="page_sales_commission" string="Ventas">
+                            <h2>Comisiones por metas de ventas (materiales)</h2>
 
-                    <br />
-                    <h2>Configuración comisiones materiales</h2>
+                            <group col="4">
+                                <field name="initial_amount" />
+                                <field name="top_amount" />
+                                <field name="commission_amount" />
+                                <field name="is_percent" />
+                            </group>
+                        </page>
 
-                    <group col="4">
-                        <field name="initial_amount" />
-                        <field name="top_amount" />
-                        <field name="commission_amount" />
-                        <field name="is_percent" />
-                    </group>
+                        <page name="page_colletion_commission" string="Cobros">
+                            <h2>Comisiones por metas de cobros</h2>
 
-                    <br />
+                            <group>
+                                <field name="collection_commission_id" widget="many2many_tags" />
+                            </group>
+                        </page>
+                    </notebook>
+
                     <h2>Configuración comisiones equipos</h2>
-                    
+
                     <group>
-                        <field name="equipment_category_id"/>
+                        <field name="equipment_category_id" />
                         <field name="equipment_equipment_margin" widget="many2many_tags" />
                     </group>
                     <br />
-                    
+
                     <field name="equipment_category_ids" domain="['|', ('parent_id', '=', equipment_category_id), ('id', '=', equipment_category_id)]" widget="many2many_checkboxes" />
                 </sheet>
             </form>
         </field>
     </record>
-    
+
     <record id="caribbean_sales_commission_setting_tree" model="ir.ui.view">
         <field name="name">caribbean.sales.commission.setting.tree</field>
         <field name="model">caribbean.sales.commission.setting</field>
         <field name="arch" type="xml">
-            <tree string="Comisiones de ventas">
+            <tree string="Comisiones">
                 <field name="name" />
                 <field name="initial_amount" />
                 <field name="top_amount" />
@@ -51,7 +61,7 @@
     </record>
 
     <record id="caribbean_sales_commission_setting_action" model="ir.actions.act_window">
-        <field name="name">Comisiones de ventas</field>
+        <field name="name">Comisiones</field>
         <field name="res_model">caribbean.sales.commission.setting</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>

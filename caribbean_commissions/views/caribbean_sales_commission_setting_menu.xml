@@ -2,10 +2,15 @@
 <odoo>
    
     <menuitem id="caribbean_sales_commission_setting_menu" 
-            name="Comisiones de ventas" 
+            name="Comisiones" 
             parent="caribbean_reports.caribbean_reporte_setting_menu" 
             action="caribbean_sales_commission_setting_action" />
 
+    <menuitem id="caribbean_colletion_commission_setting_menu" 
+            name="Comisiones de cobros por vencimiento" 
+            parent="caribbean_reports.caribbean_reporte_setting_menu" 
+            action="caribbean_collection_commission_setting_action" />
+            
     <menuitem id="caribbean_sales_commission_equipment_margin_menu" 
             name="Comisiones por margen de ganancia" 
             parent="caribbean_reports.caribbean_reporte_setting_menu" 

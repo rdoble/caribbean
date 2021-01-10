@@ -4,8 +4,6 @@ from odoo import api, fields, models
 from odoo.addons import decimal_precision as dp
 from datetime import time, datetime
 from openerp.exceptions import Warning, ValidationError
-import base64
-import os
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -22,6 +20,7 @@ class CaribbeanSalesCommissionSetting(models.Model):
     equipment_category_id = fields.Many2one('product.category', string=u'Categoria de Equipos')
     equipment_category_ids = fields.Many2many(string=u'Categorias de Equipos', comodel_name='product.category', relation='csc_pc_rel', column1='commission_id', column2='categ_id')
     equipment_equipment_margin = fields.Many2many(string=u'Comisiones por Magen (%)', comodel_name='caribbean.sales.commission.equipment.margin', relation='csc_em_rel', column1='commission_id', column2='equipment_margin_id')
+    collection_commission_id = fields.Many2many(string=u'Comisiones de Cobros', comodel_name='caribbean.collection.commission.setting', relation='csc_cc_rel', column1='commission_id', column2='collection_commission_id')
 
 class CaribbeanSalesCommissionEquipmentMargin(models.Model):
     _name = 'caribbean.sales.commission.equipment.margin'

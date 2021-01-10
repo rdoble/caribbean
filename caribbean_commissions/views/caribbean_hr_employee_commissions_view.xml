@@ -9,8 +9,12 @@
 
             <xpath expr="//page[@name='hr_settings']" position="inside">
                 <group>
-                    <group string="Ventas" name="commission_group">
+                    <group string="Ventas" name="commission_sale_group">
                         <field name="commission_id"/>
+                    </group>
+
+                    <group string="Cobros" name="commission_collection_group">
+                        <field name="commission_collection_id"/>
                     </group>
                 </group>
             </xpath>
