@@ -36,3 +36,4 @@ class CaribbeanHrEmployeeCommissions(models.Model):
     _description = 'Configuración de comisiones a empleados'
 
     commission_id = fields.Many2one('caribbean.sales.commission.setting', string=u'Comisión')
+    commission_collection_id = fields.Many2one('caribbean.sales.commission.setting', string=u'Comisión')
